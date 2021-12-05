@@ -30,7 +30,7 @@ class AimingSubmarine
 end
 
 if __FILE__ == $0
-  # Part 1
+  # Part 2
   commands = File.read(ARGV.first)
   submarine = AimingSubmarine.new do
     eval(commands)
