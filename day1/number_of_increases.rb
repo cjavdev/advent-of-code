@@ -14,6 +14,5 @@ if __FILE__ == $0
 
   # Part 2
   window_sums = sum_of_windows(3, raw_depths)
-  p window_sums
   puts number_of_increases(window_sums)
 end
