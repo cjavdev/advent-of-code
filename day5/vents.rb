@@ -29,7 +29,11 @@ class OceanFloor
   end
 
   def to_s
-    columns.map { |row| row.join('  ') }.join("\n")
+    columns.map do |row|
+      row.map do |cell|
+        cell == 0 ? '.' : cell
+      end.join
+    end.join("\n")
   end
 
   def overlaps
@@ -39,15 +43,30 @@ class OceanFloor
   def draw_lines
     lines.each do |(x1, y1), (x2, y2)|
       puts [x1, y1, x2, y2].join(',')
-      if x1 != x2 && y1 != y2
-        puts "Next: " + [x1, y1, x2, y2].join(',')
-        next
+      if x1 == x2 || y1 == y2
+        draw_normal_line([x1, y1], [x2, y2])
+      else
+        draw_diagonal_line([x1, y1], [x2, y2])
       end
+    end
+  end
 
-      [x1, x2].min.upto([x1, x2].max) do |x|
-        [y1, y2].min.upto([y1, y2].max) do |y|
-          self[x, y] += 1
-        end
+  def draw_diagonal_line((x1, y1), (x2, y2))
+    x_dir = x1 < x2 ? 1 : -1
+    y_dir = y1 < y2 ? 1 : -1
+
+    self[x1, y1] += 1
+    while x1 != x2 && y1 != y2
+      x1 += x_dir
+      y1 += y_dir
+      self[x1, y1] += 1
+    end
+  end
+
+  def draw_normal_line((x1, y1), (x2, y2))
+    [x1, x2].min.upto([x1, x2].max) do |x|
+      [y1, y2].min.upto([y1, y2].max) do |y|
+        self[x, y] += 1
       end
     end
   end
