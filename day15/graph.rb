@@ -34,16 +34,61 @@ class Node
 end
 
 class Graph
+
   attr_reader :risk_levels
-  def initialize(risk_levels)
+
+  def initialize(rl, size=1)
     @nodes = {}
-    @risk_levels = risk_levels
-    risk_levels.each_with_index do |row, i|
+    width = rl.length
+    height = rl.first.length
+    @risk_levels = Array.new(width) do
+      Array.new(height * size, nil)
+    end
+
+    rl.each_with_index do |row, i|
       row.each_with_index do |cell, j|
-        @nodes[[i, j]] = Node.new([i, j], cell)
+        # puts "Setting: #{ [i, j] } = #{cell}"
+        @risk_levels[i][j] = cell
+
+        (size - 1).times do |s|
+          s += 1
+          val = (cell + s)
+          val %= 9 if val > 9
+          # puts "Setting: #{ [i,j + (height * s)] } = #{val}"
+          @risk_levels[i][j + (height * s)] = val
+          # p @risk_levels
+          # puts "Setting: #{ [i + (width * s), j] } = #{val}"
+          # @risk_levels[i + (width * s)][j] = val
+
+          # val2 = val + 1
+          # val2 %= 9 if val2 > 9
+          # puts "Setting: #{ [i + (width * s), j + (height * s)] } = #{val }"
+          # # byebug
+          # @risk_levels[i + (width * s)][j + (height * s)] = val2
+        end
       end
     end
-    risk_levels.each_with_index do |row, i|
+    new_rows = []
+    (size - 1).times do |s|
+      new_row = @risk_levels.map do |row|
+        row.map do |cell|
+          cell += s + 1
+          cell %= 9 if cell > 9
+          cell
+        end
+      end
+      new_rows += new_row
+    end
+    @risk_levels += new_rows
+
+    @risk_levels.each_with_index do |row, i|
+      row.each_with_index do |cell, j|
+        pt = [i, j]
+        @nodes[pt] = Node.new(pt, cell)
+      end
+    end
+
+    @risk_levels.each_with_index do |row, i|
       row.each_with_index do |cell, j|
         node = @nodes[[i, j]]
         neighbors([i, j]).each do |n|
@@ -118,78 +163,21 @@ class Graph
       [i, j + 1],
       [i, j - 1],
     ].select do |x, y|
-      x.between?(0, risk_levels.length - 1) &&
-        y.between?(0, risk_levels.first.length - 1)
+      x.between?(0, @risk_levels.length - 1) &&
+        y.between?(0, @risk_levels.first.length - 1)
     end
   end
+
+  def to_s
+    @risk_levels.map do |row|
+      row.join
+    end.join("\n")
+  end
 end
-# class Graph
-#
-#   attr_reader :risk_levels, :aggregate
-#   def initialize(risk_levels)
-#     @risk_levels = risk_levels
-#     @aggregate = Array.new(risk_levels.length) do
-#       Array.new(risk_levels.first.length, Float::INFINITY)
-#     end
-#     @aggregate[0][0] = 0
-#     @risk_levels[0][0] = 0
-#   end
-#
-#   def []((i, j))
-#     @risk_levels[i][j]
-#   end
-#
-#   def ag((i, j))
-#     @aggregate[i][j]
-#   end
-#
-#   def set_ag((i, j), v)
-#     @aggregate[i][j] = v
-#   end
-#
-#   def calculate
-#     queue = PQueue.new([[[0, 0], 0]]) { |(coord, v), (coord2, v2)| v < v2 }
-#     visited = Set.new
-#
-#     while !queue.empty?
-#       # This needs to be pulling from a priority
-#       # queue
-#       current_location, current_value = queue.pop
-#
-#       neighbors(current_location).each do |n|
-#         neighbor_value = self[n]
-#         new_cost = current_value + neighbor_value
-#         next if visited.include?(n)
-#         visited << current_location
-#         if new_cost < self.ag(n)
-#           self.set_ag(n, new_cost)
-#         end
-#         queue.push([n, self.ag(n)])
-#       end
-#
-#       # if queue.length % 100 == 0
-#       #   puts "v: #{visited.length} q: #{queue.length}"
-#       # end
-#     end
-#   end
-#
-#   def min_risk
-#     @aggregate.flatten.last
-#   end
-#
-#   def neighbors((i, j))
-#     [
-#       [i + 1, j],
-#       [i, j + 1]
-#     ].select do |x, y|
-#       x.between?(0, risk_levels.length - 1) &&
-#         y.between?(0, risk_levels.first.length - 1)
-#     end
-#   end
-# end
 
 if __FILE__ == $0
   lines = File.readlines(ARGV.shift).map(&:chomp).map {_1.chars.map(&:to_i)}
-  graph = Graph.new(lines)
+  graph = Graph.new(lines, 5)
+  puts graph
   p graph.calculate
 end
