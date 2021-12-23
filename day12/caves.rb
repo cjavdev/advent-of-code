@@ -42,18 +42,20 @@ end
 
 
 if __FILE__ == $0
-  graph = build_graph(File.readlines(ARGV.first).map(&:chomp))
-  puts find_all_paths(graph).length
+  # graph = build_graph(File.readlines(ARGV.first).map(&:chomp))
+  # p graph
+  # puts find_all_paths(graph).length
 end
 
-# g = build_graph([
-#   'start-A',
-#   'start-b',
-#   'A-c',
-#   'A-b',
-#   'b-d',
-#   'A-end',
-#   'b-end',
-# ])
-# #
-# p find_all_paths(g).length
+g = build_graph([
+  'start-A',
+  'start-b',
+  'A-c',
+  'A-b',
+  'b-d',
+  'A-end',
+  'b-end',
+])
+p g
+#
+p find_all_paths(g).length

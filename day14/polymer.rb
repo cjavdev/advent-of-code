@@ -5,6 +5,7 @@ class Polymer
     template.chars.each_cons(2) do |pair|
       @template[pair.join] += 1
     end
+
     @pairs = pairs
   end
 
