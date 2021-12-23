@@ -2,6 +2,7 @@ require 'byebug'
 
 class Bitstream
   attr_reader :sum_versions
+
   OPS = [
     :+,
     :*,
