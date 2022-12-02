@@ -7,7 +7,7 @@ data = File.read(ARGV.first)
 # p data
 #   .each_line
 #   .map(&:chomp)
-#   .chunk_while { |a, b| b != '' }
+#   .chunk_while { _2 != '' }
 #   .map { _1.map(&:to_i) }
 #   .map(&:sum)
 #   .max
@@ -16,7 +16,7 @@ data = File.read(ARGV.first)
 p data
   .each_line
   .map(&:chomp)
-  .chunk_while { |a, b| b != '' }
+  .chunk_while { _2 != '' }
   .map { _1.map(&:to_i) }
   .map(&:sum)
   .sort[-3..-1]
