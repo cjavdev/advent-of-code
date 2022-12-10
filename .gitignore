@@ -1,2 +1,4 @@
 venv/
 .byebug_history
+input
+**/*input*/**
