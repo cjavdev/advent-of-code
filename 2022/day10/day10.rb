@@ -23,10 +23,15 @@ end
 
 cycle_tracker = Hash[registers.to_a]
 
-# Part 1
-p Enumerator
-  .produce(20) { _1 + 40 }
-  .take(6)
+# Part 1 with enumerator
+# p Enumerator
+#   .produce(20) { _1 + 40 }
+#   .take(6)
+#   .inject(0) {|sum, sig| sum + (cycle_tracker[sig] * sig) }
+
+# Part 1 with range + step
+p (20..240)
+  .step(40)
   .inject(0) {|sum, sig| sum + (cycle_tracker[sig] * sig) }
 
 # Part 2
