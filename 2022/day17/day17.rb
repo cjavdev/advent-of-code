@@ -1,7 +1,7 @@
 require 'byebug'
 
 class Piece
-  attr_reader :positions
+  attr_reader :positions, :kind
 
   ORDER = [
     :dash,
@@ -9,43 +9,48 @@ class Piece
     :jay,
     :line,
     :square
-  ].cycle
+  ]
+
+  def self.order
+    @order ||= ORDER.cycle
+  end
 
   def self.generate(start)
-    send(ORDER.next, start)
+    send(order.next, start)
   end
 
   def self.line(start)
     Piece.new([
       [0, 0], [1, 0], [2, 0], [3, 0]
-    ], start)
+    ], start, :line)
   end
 
   def self.dash(start)
     Piece.new([
       [0, 0], [0, 1], [0, 2], [0, 3]
-    ], start)
+    ], start, :dash)
   end
 
   def self.square(start)
     Piece.new([
       [0, 0], [0, 1], [1, 0], [1, 1]
-    ], start)
+    ], start, :square)
   end
 
   def self.plus(start)
     Piece.new([
       [0, 1], [1, 0], [1, 1], [1, 2], [2, 1]
-    ], start)
+    ], start, :plus)
   end
 
   def self.jay(start)
     Piece.new([
       [0, 0], [0, 1], [0, 2], [1, 2], [2, 2]
-    ], start)
+    ], start, :jay)
   end
 
-  def initialize(positions, start)
+  def initialize(positions, start, kind)
+    @kind = kind
     @positions = positions.map do |pos|
       [pos[0] + start[0], pos[1] + start[1]]
     end
@@ -85,21 +90,22 @@ class Piece
 end
 
 class Board
-  attr_reader :grid, :current_piece
+  attr_reader :grid, :current_piece, :instruction_number
   attr_accessor :rocks
 
   def initialize(instructions, rocks)
-    @grid = Array.new(4) { Array.new(7, 0) }
+    @grid = Array.new(30) { Array.new(7, 0) }
     @pieces = []
     @instructions = instructions.cycle
     @rocks = rocks
+    @seen = Set.new
   end
 
   def all_positions
     @pieces.map(&:positions).flatten(1)
   end
 
-  def top_row
+  def height
     if all_positions.any?
       all_positions.map(&:first).max + 1
     else
@@ -108,34 +114,36 @@ class Board
   end
 
   def spawn_piece
-    @current_piece = Piece.generate([top_row + 3, 2])
+    @current_piece = Piece.generate([height + 3, 2])
     @falling = false
+    if @seen.include?(key)
+      throw :done
+    else
+      puts "Seen: #{@seen.size} / #{key}"
+      @seen << key
+    end
   end
 
   def tick
-    if top_row > @grid.length - 5
-      @grid << Array.new(7, 0)
-      @grid << Array.new(7, 0)
-      @grid << Array.new(7, 0)
-      @grid << Array.new(7, 0)
-      @grid << Array.new(7, 0)
-      @grid << Array.new(7, 0)
+    # Grow the grid if necessary
+    if height > @grid.length - 5
+      @grid += Array.new(6) { Array.new(7, 0) }
     end
 
     spawn_piece if @current_piece.nil?
 
     if !@falling
       instruction = @instructions.next
+      @instruction_number += 1
       @current_piece.send(instruction, all_positions)
       @falling = true
     else
-      if @current_piece.move_down(all_positions)
-        @falling = false
-      else
+      if !@current_piece.move_down(all_positions)
         lock_piece(@current_piece)
         @current_piece = nil
-        @falling = false
       end
+
+      @falling = false
     end
   end
 
@@ -145,6 +153,21 @@ class Board
     piece.positions.each do |pos|
       @grid[pos[0]][pos[1]] = 1
     end
+  end
+
+  def run
+    while @rocks > 0
+      tick
+    end
+    height
+  end
+
+  def recent_snapshot
+    grid[-20..height].join
+  end
+
+  def key
+    [current_piece.kind, instruction_number, recent_snapshot].join
   end
 
   def to_s
@@ -172,44 +195,16 @@ instructions = pattern.chars.map do |c|
   c == '>' ? :move_right : :move_left
 end
 
-ins = (0..instructions.length).to_a.cycle
-pieces = Piece::ORDER
+# Part 1
+# board = Board.new(instructions, 2022)
+# puts "Expected 3068 actual #{board.run}"
 
+# Part 2
+board = Board.new(instructions, 2022)
 seen = Set.new
-(0..220).each do |x|
-  cur = [ins.next, pieces.next]
-  if seen.include?(cur)
-    puts "#{[x, cur]} seen"
-  else
-    puts "#{[x, cur]} Havent"
-  end
-  seen << cur
+while true
+  board.tick
 end
-
-rocks = seen.length
-b = Board.new(instructions, rocks)
-while b.rocks > 0
-  b.tick
-end
-
-height = b.top_row
-puts "height after #{rocks} rocks: #{height} units"
-
-rock_height = height
-num_rocks_increase = 207
-rock_height_increase = height
-
-target = 2022
-intervals = target / num_rocks_increase - 1
-puts "intervals: #{intervals}"
-final_rocks = rocks + (intervals * num_rocks_increase)
-final_height = rock_height + intervals * rock_height_increase
-
-p "final rocks: #{final_rocks}, final height: #{final_height}"
-
-# while b.top_row <= height
-#   b.tick
-# end
-#
-# puts "height after #{rocks + b.rocks.abs} rocks: #{b.top_row} units"
-#
+# board = Board.new(instructions, 20)
+# board.run
+# p board.recent_snapshot

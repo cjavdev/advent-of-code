@@ -76,9 +76,9 @@ def max_flow(current, opened, min_left, others)
 end
 
 # Part 1
-# p max_flow("AA", [], 30)
+# p max_flow("AA", [], 30, 0)
 # Part 2
-p max_flow("AA", [], 26, 1)
+ p max_flow("AA", [], 26, 1)
 # p max_flow("AA", [], 30, 0)
 
 
