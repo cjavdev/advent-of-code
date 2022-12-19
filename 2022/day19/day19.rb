@@ -3,7 +3,6 @@ require 'byebug'
 def blueprints(data)
   data
     .map { |line| line.split(/ |:/) }
-    .tap { p _1 }
     .map do |line|
       {
         id: line[1].to_i,
@@ -13,7 +12,6 @@ def blueprints(data)
         obsidian_robot_clay: line[22].to_i,
         geode_robot_ore: line[28].to_i,
         geode_robot_obsidian: line[31].to_i,
-        min_ore: [line[7].to_i, line[13].to_i, line[19].to_i, line[28].to_i].min,
         max_ore: [line[7].to_i, line[13].to_i, line[19].to_i, line[28].to_i].max,
         max_clay: line[22].to_i,
         max_obsidian: line[31].to_i,
