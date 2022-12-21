@@ -9,10 +9,11 @@ expressions = {}
 
 data.each do |line|
   name, expression = line.split(': ')
-  if name == 'humn'
+  if name == 'humn' # Part 2
     # no op
   elsif expression.include?(' ')
     left, op, right = expression.split
+    # Part 2
     op = "=".to_sym if name == 'root'
     expressions[name] = [left, op.to_sym, right]
   else
