@@ -1,78 +1,114 @@
 if ARGV.empty?
-  data = DATA.readlines(chomp:true)
+  data = DATA.readlines(chomp: true)
 else
-  data = File.readlines('input', chomp: true)
+  data = File.readlines(ARGV[0], chomp: true)
 end
 
 solved = {}
 expressions = {}
 
-data
-  .each do |line|
-    name, v = line.split(": ")
-    if name == 'humn'
-      # No op
-    elsif v.include?(' ')
-      a, op, b = v.split
-      op = :== if name == "root"
-      expressions[name] = [a, op.to_sym, b]
-    else
-      solved[name] = v.to_i
-    end
-  end
-
-15.times do
-  expressions.each do |k, (a, op, b)|
-    if !a.is_a?(Integer) && solved.has_key?(a)
-      a = solved[a]
-    end
-    if !b.is_a?(Integer) && solved.has_key?(b)
-      b = solved[b]
-    end
-    if a.is_a?(Integer) && b.is_a?(Integer)
-      solved[k] = a.send(op, b)
-      expressions.delete(k)
-    else
-      expressions[k] = [a, op, b]
-    end
-  end
-end
-
-expressions["humn"] = ["x"]
-
-def get(a, expressions)
-  if a.is_a?(String) && expressions.has_key?(a)
-    x = expressions[a]
-    expressions.delete(a)
-    x
-  elsif a.is_a?(Array)
-    a.map {get(_1, expressions)}
+data.each do |line|
+  name, expression = line.split(': ')
+  if name == 'humn'
+    # no op
+  elsif expression.include?(' ')
+    left, op, right = expression.split
+    op = "=".to_sym if name == 'root'
+    expressions[name] = [left, op.to_sym, right]
   else
-    a
+    solved[name] = expression.to_i
   end
 end
 
-15.times do
-  expressions.each do |k, v|
-    v = v.map do |a|
-      get(a, expressions)
+r = 0
+while r < 15
+  r += 1
+  expressions.each do |name, expression|
+    left, op, right = expression
+    if !left.is_a?(Integer) && solved.has_key?(left)
+      left = solved[left]
     end
-    expressions[k] = v
+    if !right.is_a?(Integer) && solved.has_key?(right)
+      right = solved[right]
+    end
+    if left.is_a?(Integer) && right.is_a?(Integer)
+      # solved[name] = left + right
+      solved[name] = left.send(op, right)
+      expressions.delete(name)
+    else
+      expressions[name] = [left, op, right]
+    end
   end
 end
 
-def rp(x)
-  if x.is_a?(Array)
+def get(n, expressions)
+  if n == 'humn'
+    'x'
+  elsif n.is_a?(String) && expressions.has_key?(n)
+    x = expressions[n]
+    expressions.delete(n)
+    x
+  elsif n.is_a?(Array)
+    n.map { |x| get(x, expressions) }
+  else
+    n
+  end
+end
+
+10.times do
+  expressions.each do |k, v|
+    expressions[k] = v.map do |v|
+      get(v, expressions)
+    end
+  end
+end
+
+def print_eq(eq)
+  if eq.is_a?(Array)
     print "("
-    x.each{rp(_1)}
+    eq.map { |x| print_eq(x) }
     print ")"
   else
-    print x.to_s
+    print eq.to_s
   end
 end
 
-rp(expressions['root'])
-puts solved['root']
+print_eq(expressions['root'])
+
+
+# PART 1
+# data.each do |line|
+#   name, expression = line.split(': ')
+#   if expression.include?(' ')
+#     left, op, right = expression.split
+#     expressions[name] = [left, op.to_sym, right]
+#   else
+#     solved[name] = expression.to_i
+#   end
+# end
+#
+# while expressions.any?
+#   expressions.each do |name, expression|
+#     left, op, right = expression
+#     if !left.is_a?(Integer) && solved.has_key?(left)
+#       left = solved[left]
+#     end
+#
+#     if !right.is_a?(Integer) && solved.has_key?(right)
+#       right = solved[right]
+#     end
+#
+#     if left.is_a?(Integer) && right.is_a?(Integer)
+#       # solved[name] = left + right
+#       solved[name] = left.send(op, right)
+#       expressions.delete(name)
+#     else
+#       expressions[name] = [left, op, right]
+#     end
+#   end
+# end
+
+
 
 __END__
 root: pppw + sjmn
@@ -90,3 +126,4 @@ pppw: cczh / lfqf
 lgvd: ljgn * ptdq
 drzm: hmdt - zczc
 hmdt: 32
+
