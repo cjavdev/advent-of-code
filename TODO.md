@@ -85,3 +85,33 @@
 - `String#tr_s!`
 - `String#unicode_normalize`
 - `String#unicode_normalize!`
+
+## `MatchData`
+
+- `MatchData#begin`
+- `MatchData#captures`
+- `MatchData#length`
+- `MatchData#names`
+- `MatchData#offset`
+- `MatchData#post_match`
+- `MatchData#pre_match`
+- `MatchData#regexp`
+- `MatchData#size`
+- `MatchData#string`
+- `MatchData#to_a`
+- `MatchData#to_s`
+- `MatchData#values_at`
+
+## `Range`
+
+- `Range#bsearch`
+- `Range#cover?`
+- `Range#each`
+- `Range#endless?`
+- `Range#eql?`
+- `Range#first`
+- `Range#include?`
+- `Range#last`
+- `Range#member?`
+- `Range#step`
+- `Range#to_s`
