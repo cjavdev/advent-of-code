@@ -1,4 +1,5 @@
 require "set"
+
 input = <<~INPUT
 FF7FSF7F7F7F7F7F---7
 L|LJ||||||||||||F--J
@@ -12,8 +13,16 @@ L.L7LFJ|||||FJL7||LJ
 L7JLJL-JLJLJL--JLJ.L
 INPUT
 
+input = <<~INPUT
+..F7.
+.FJ|.
+SJ.L7
+|F--J
+LJ...
+INPUT
+
 data = input.each_line.map(&:chomp)
-data = DATA.readlines.map(&:chomp)
+# data = DATA.readlines.map(&:chomp)
 grid = data.map(&:chars)
 
 def find_start(grid)
@@ -47,7 +56,12 @@ def find_cn(grid, cell)
 end
 
 sx, sy = s
-paths =  [[-1,0],[0,1],[1,0],[0,-1]].map do |(dx, dy)|
+paths =  [
+  [-1,0],
+  [0,1],
+  [1,0],
+  [0,-1]
+].map do |(dx, dy)|
   [sx + dx, sy + dy]
 end
 
@@ -71,6 +85,8 @@ while node != valid.last
     count += 1
   end
 end
+
+puts "Part 1: #{pipe.size}"
 
 just_path = Array.new(grid.size) { Array.new(grid[0].size, " ") }
 
@@ -110,4 +126,3 @@ end
 
 puts "Inside count: #{inside_count}"
 # puts "Inside spots: #{inside_spots}"
-
