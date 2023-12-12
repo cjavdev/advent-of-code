@@ -1,5 +1,4 @@
 require 'rspec/autorun'
-require 'byebug'
 
 input = <<~INPUT
 ???.### 1,1,3
@@ -10,146 +9,110 @@ input = <<~INPUT
 ?###???????? 3,2,1
 INPUT
 
-def clean_sym(s)
-  # Ensure we always start and end with a dot.
-  ".#{s.gsub(/^\.+|\.+$/, '')}."
+def expand(record)
+  ([record] * 5).join("?")
 end
 
-def all_options(sym)
-  return [""] if sym.empty?
+def parse2(line)
+  record, sizes = line.split(' ')
+  sizes = sizes.split(',').map(&:to_i) * 5
 
-  options = []
-  head, *tail = sym.chars
-
-  if head == "?"
-    all_options(tail.join).each do |o|
-      options << "#" + o
-      options << "." + o
-    end
-  else
-    all_options(tail.join).each do |o|
-      options << head + o
-    end
-  end
-
-  options
+  record = "#{expand(record)}.".gsub(/\.+/, '.')
+  [record, sizes]
 end
 
-def count2(expanded, sizes)
-  options = all_options(expanded)
-  options.count do |o|
-    sizes == o.split('.').reject{_1==""}.map(&:size)
-  end
+def parse(line)
+  record, sizes = line.split(' ')
+  sizes = sizes.split(',').map(&:to_i)
+  record = "#{record}."
+  [record, sizes]
 end
 
-def count3(sym, sizes, group_count=0, cache={})
-  # p [sym, sizes, group_count]
+def count(record, sizes, group_size = 0, cache = {})
+  key = [record, sizes, group_size]
 
-  key = [sym, sizes, group_count]
   if cache[key]
     return cache[key]
   end
 
-  if sizes.any? { _1 - group_count > sym.size }
+  if sizes.any? { |s| s - group_size > record.length }
     return cache[key] = 0
   end
 
   if sizes.empty?
-    if !sym.include?("#")
+    if !record.include?("#")
       return cache[key] = 1
     else
       return cache[key] = 0
     end
   end
 
-  head, *tail = sym.chars
-  case [head, group_count]
-  in ["?", *]
-    return cache[key] = count3("#" + tail.join, sizes, group_count, cache) + count3("." + tail.join, sizes, group_count, cache)
-  in ["#", *]
-    # We're inside a group, keep counting and increment group count.
-    return cache[key] = count3(tail.join, sizes, group_count + 1, cache)
-  in [".", (1..)]
-    # We just exited a group, and are done with this section of the string.
-    if group_count == sizes.first
-      return cache[key] = count3(tail.join, sizes[1..], 0, cache)
-    else
-      # If group count is greater than 0 and we're on a dot, this state is invalid
-      return cache[key] = 0
-    end
-  in [".", 0]
-    return cache[key] = count3(tail.join, sizes, 0, cache)
-  end
+  current, *rest = record.chars
+  s = sizes.first
 
-  cache[key] = 0
+  case [current, group_size]
+  in ['?', _]
+    # with both the `.` and the `#` instead of the question mark
+    return cache[key] = count('#' + rest.join, sizes, group_size, cache) + count('.' + rest.join, sizes, group_size, cache)
+  in ['#', _]
+    # keep moving forward through the group of brokens #
+    return cache[key] = count(rest.join, sizes, group_size + 1, cache)
+  in ['.', ^s]
+    # If we found the end of the group because group_size == sizes.first
+    return cache[key] = count(rest.join, sizes[1..], 0, cache)
+  in ['.', (1..)]
+    # Invalid group size / not enough #s
+    return cache[key] = 0
+  in ['.', 0]
+    # no-op - keep moving forward
+    return cache[key] = count(rest.join, sizes, 0, cache)
+  end
 end
 
 data = input.each_line
-data = DATA.readlines
+# data = DATA.readlines
 
-records = data.map do |line|
-  line.split(' ') => sym, n
-  n = n.split(',').map(&:to_i)
-  [sym, n]
-end
+puts "Record Count: #{data.count}"
 
-# Part 1
-puts "Working on Part 1a"
-# records.inject(0) do |sum, (sym, n)|
-#   sum + count2(clean_sym(sym), n)
-# end => r
-#
-# puts "Part 1a: #{r}"
+counter = 0
+data.inject(0) do |sum, line|
+  if counter % 5 == 0
+    puts counter
+  end
+  counter += 1
 
-cache = {}
-records.inject(0) do |sum, (sym, n)|
-  sum + count3(clean_sym(sym), n, 0, cache)
+  record, sizes = parse2(line)
+  sum + count(record, sizes)
 end => r
-puts "Part 1b: #{r}"
 
-# Part 2
-cache = {}
-records = records.map do |sym, n|
-  [([sym] * 5).join("?"), n * 5]
-end.inject(0) do |sum, (sym, n)|
-  sum + count3(clean_sym(sym), n, 0, cache)
-end => r
 puts "Part 2: #{r}"
 
 describe 'count' do
-  it 'works for basic cases' do
-    expect(count2(clean_sym('#.#'), [1, 1])).to eq(1)
-    expect(count2(clean_sym('#..'), [1, 1])).to eq(0)
-    expect(count2(clean_sym('#.#.'), [1, 1])).to eq(1)
-    expect(count2(clean_sym('.??..??...?##.'), [1, 1, 3])).to eq(4)
-    expect(count2(clean_sym('????.#...#...'), [4, 1, 1])).to eq(1)
-    expect(count2(clean_sym('????.######..#####.'), [1, 6, 5])).to eq(4)
-    expect(count2(clean_sym(""), [2])).to eq(0)
-    expect(count2(".???.", [2])).to eq(2)
-    expect(count2(clean_sym('.???'), [2])).to eq(2)
-    expect(count2(clean_sym('?###????'), [3, 2])).to eq(2)
-    expect(count2(clean_sym('?###?????'), [3, 2])).to eq(3)
-    expect(count2(clean_sym('?###????????'), [3, 2, 1])).to eq(10)
-    expect(count2(clean_sym('???'), [1, 1])).to eq(1)
-    expect(count2(clean_sym('???.###'), [1, 1, 3])).to eq(1)
-    expect(count2(clean_sym('?#?#?#?#?#?#?#?'), [1, 3, 1, 6])).to eq(1)
-    expect(count2(clean_sym("?#??..?#??##?????."), [1, 11])).to eq(1)
+  it 'parses as expected' do
+    expect(parse2("???.### 1,1,3")).to eq([
+      "???.###????.###????.###????.###????.###.",
+      [1,1,3,1,1,3,1,1,3,1,1,3,1,1,3]
+    ])
+  end
 
-    expect(count3(clean_sym('#.#'), [1, 1])).to eq(1)
-    expect(count3(clean_sym('#..'), [1, 1])).to eq(0)
-    expect(count3(clean_sym('#.#.'), [1, 1])).to eq(1)
-    expect(count3(clean_sym('.??..??...?##.'), [1, 1, 3])).to eq(4)
-    expect(count3(clean_sym('????.#...#...'), [4, 1, 1])).to eq(1)
-    expect(count3(clean_sym('????.######..#####.'), [1, 6, 5])).to eq(4)
-    expect(count3(clean_sym(""), [2])).to eq(0)
-    expect(count3(".???.", [2])).to eq(2)
-    expect(count3(clean_sym('.???'), [2])).to eq(2)
-    expect(count3(clean_sym('?###????'), [3, 2])).to eq(2)
-    expect(count3(clean_sym('?###?????'), [3, 2])).to eq(3)
-    expect(count3(clean_sym('?###????????'), [3, 2, 1])).to eq(10)
-    expect(count3(clean_sym('???'), [1, 1])).to eq(1)
-    expect(count3(clean_sym('???.###'), [1, 1, 3])).to eq(1)
-    expect(count3(clean_sym('?#?#?#?#?#?#?#?'), [1, 3, 1, 6])).to eq(1)
-    expect(count3(clean_sym("?#??..?#??##?????."), [1, 11])).to eq(1)
+  it 'works on basic cases' do
+    cases = [
+      ["# 1", 1],
+      [".# 1", 1],
+      ["#. 1", 1],
+      ["#. 2", 0],
+      ["???.### 1,1,3", 1],
+      [".??..??...?##. 1,1,3", 4],
+      ["?#?#?#?#?#?#?#? 1,3,1,6", 1],
+      ["????.#...#... 4,1,1", 1],
+      ["????.######..#####. 1,6,5", 4],
+      ["?###???????? 3,2,1", 10],
+    ]
+
+    cases.each do |input, expected|
+      expect(count(*parse(input))).to eq(expected), -> { p input }
+    end
   end
 end
+
+
