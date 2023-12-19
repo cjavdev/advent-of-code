@@ -1,5 +1,3 @@
-require 'set'
-
 input = <<~INPUT
 R 6 (#70c710)
 D 5 (#0dc571)
@@ -16,53 +14,84 @@ U 3 (#a77fa3)
 L 2 (#015232)
 U 2 (#7a21e3)
 INPUT
-# input = DATA.read
-ins = input.split("\n").map(&:split)
+
 
 DIRS = {
-  "U" => [-1, 0],
-  "D" => [1, 0],
+  "R" => [0, 1],
   "L" => [0, -1],
-  "R" => [0, 1]
+  "U" => [-1, 0],
+  "D" => [1, 0]
 }
 
+# 0 means R, 1 means D, 2 means L, and 3 means U.
 DIRS2 = {
-  "3" => [-1, 0],
-  "1" => [1, 0],
+  "0" => [0, 1],
   "2" => [0, -1],
-  "0" => [0, 1]
+  "3" => [-1, 0],
+  "1" => [1, 0]
 }
 
-ins = ins.map do |dir, steps, color|
-  [DIRS[dir], steps.to_i, color]
+# input = DATA.read
+instructions = input.split("\n").map do |line|
+  dir, steps, color = line.split(' ')
+  color = color.gsub(/[()#]/, '')
+
+  # PART 1
+  # steps = steps.to_i
+  # dir = DIRS[dir]
+
+  # PART 2
+  steps = color[0...5].to_i(16)
+  dir = DIRS2[color[5]]
+
+  [dir, steps]
 end
 
-ins = ins.map do |dir, steps, color|
-  co = color.gsub("(", "").gsub(")", "").gsub("#", "")
-  cs = co[0...5].to_i(16)
-  dir2 = co[5]
-  # [DIRS[dir], steps.to_i, color]#
-  [DIRS2[dir2], cs]
-end
-# p ins
-pos = [0, 0]
 
-wall = [pos]
+# Array implementation which is too slow for part 2
+# current = [0, 0]
+# wall = []
+#
+# instructions.each do |dir, steps|
+#   steps.times do
+#     current = [current[0] + dir[0], current[1] + dir[1]]
+#     wall << current
+#   end
+# end
+#
+# wall.each_cons(2).sum do |(x1, y1), (x2, y2)|
+#   x1 * y2 - x2 * y1
+# end.abs.fdiv(2) => area
+# puts area
 
-ins.each do |(dx, dy), s|
-  s.times do
-    pos = pos[0] + dx, pos[1] + dy
-    wall << pos.dup
+
+# Enumerator implementation which is fast enough for part 2
+def gen(instructions, counter)
+  current = [0, 0]
+  Enumerator.new do |enum|
+    instructions.each do |dir, steps|
+      steps.times do
+        counter.call
+        current = [current[0] + dir[0], current[1] + dir[1]]
+        enum << current
+      end
+    end
   end
 end
 
-p wall.length
-wall
-  .each_cons(2)
-  .sum do |(x1, y1), (x2,y2)|
+wall_length = 0
+gen(instructions, -> { wall_length += 1 })
+  .each_cons(2) # shoelace formula
+  .sum do |(x1, y1), (x2, y2)|
     x1 * y2 - x2 * y1
   end
     .abs
-    .fdiv(2) => a
+    .fdiv(2) => area
 
-p (a - wall.length/2) + wall.length
+# Pick's theorem
+# A = i + (b / 2) - 1
+# I = A - (b / 2) + 1
+interior_points = area - (wall_length / 2) + 1
+
+# Add the boundary points back in with the wall points
+puts interior_points + wall_length
