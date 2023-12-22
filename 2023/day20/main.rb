@@ -135,6 +135,10 @@ class Conjunction < Node
 
   def go
     if all_high?
+      # if name == :st
+      #   puts "ST IS HIGH"
+      # end
+
       get_low
     else
       get_high
@@ -191,9 +195,22 @@ end
 # Part 2
 begin
   button_presses = 0
-  while true
+  while button_presses < 10_000_000
     button_presses += 1
     button(nodes)
+    # [
+    #   :gr,
+    #  # :tn, :hh, :dt
+    # ].each do |name|
+    if nodes[:gr].all_high?
+      p "#{button_presses}: #{high_ones}"
+      break
+      # high_ones << name
+    end
+    # end
+    # if high_ones.any?
+    #   p "#{button_presses}: #{high_ones}"
+    # end
     if button_presses % 1000 == 0
       puts "Button presses: #{button_presses}"
     end
@@ -206,6 +223,14 @@ end
 __END__
 %np -> vn
 &lv -> rx
+&st -> lv
+&gr -> tp, fs, px, st, th, sg
+&tn -> lv
+&vc -> gl, tv, pc, qd, tn, dg
+&hh -> lv
+&db -> np, gt, zj, ns, hh, rt
+&dt -> lv
+&lz -> dt, dk, qf
 %rt -> ns
 %th -> bc
 %gt -> rt, db
@@ -219,7 +244,6 @@ __END__
 %dk -> xl
 %qq -> th, gr
 %ns -> xv
-&vc -> gl, tv, pc, qd, tn, dg
 %bd -> lz, vm
 %ms -> lz, bd
 %dg -> rv
@@ -244,20 +268,13 @@ __END__
 %xv -> qm, db
 %rq -> gr
 %cq -> hf, db
-&lz -> dt, dk, qf
-&gr -> tp, fs, px, st, th, sg
-&st -> lv
-&tn -> lv
 %xz -> ds, lz
-&hh -> lv
-&db -> np, gt, zj, ns, hh, rt
 %qd -> dg
 %jq -> vc, fk
 %jp -> cf, vc
 %rj -> jp, vc
 %tv -> kz
 %cd -> gg, gr
-&dt -> lv
 %ld -> hx, gr
 %kz -> gl, vc
 broadcaster -> pc, sg, qf, gt
