@@ -69,9 +69,7 @@ end
 input = DATA.read
 
 bricks = input.split("\n").map.with_index do |line, i|
-  coords = line
-    .split(/[,~]/)
-    .map(&:to_i)
+  coords = line.split(/[,~]/).map(&:to_i)
   Brick.new(i, *coords)
 end
 
@@ -101,8 +99,7 @@ end
 def fall(bricks)
   # Move blocks down as far as they can go until they hit another cube
   shifts = 0
-  dup_bricks = bricks.dup
-  dup_bricks.each do |brick|
+  bricks.each do |brick|
     brick.drop!
     if !valid_bricks?(bricks)
       brick.undrop!
@@ -112,19 +109,22 @@ def fall(bricks)
   end
   if shifts > 0
     puts "falling #{shifts}"
-    fall(dup_bricks)
+    fall(bricks)
   end
 end
 
 def can_fall?(bricks)
   # Move blocks down as far as they can go until they hit another cube
-  dup_bricks = bricks.dup
-  dup_bricks.each do |brick|
+  falls = false
+  bricks.each do |brick|
     brick.drop!
     if valid_bricks?(bricks)
-      return true
+      falls = true
     end
     brick.undrop!
+    if falls
+      return true
+    end
   end
   false
 end
@@ -142,7 +142,8 @@ def disintigrate(bricks)
   count
 end
 
-p disintigrate(bricks) - 1
+puts "Disintigrating..."
+p disintigrate(bricks)
 
 
 # cubes = []
@@ -160,21 +161,21 @@ p disintigrate(bricks) - 1
 # end
 # p cubes
 
-cubes = bricks.map(&:cubes).flatten(1).to_set
-(0..Brick.maxz).each do |z|
-  puts "layer #{z}"
-  (0..Brick.maxy).each do |y|
-    (0..Brick.maxx).each do |x|
-      if cubes.include?([x,y,z])
-        print "#"
-      else
-        print "."
-      end
-    end
-    puts
-  end
-  puts "----------"
-end
+# cubes = bricks.map(&:cubes).flatten(1).to_set
+# (0..Brick.maxz).each do |z|
+#   puts "layer #{z}"
+#   (0..Brick.maxy).each do |y|
+#     (0..Brick.maxx).each do |x|
+#       if cubes.include?([x,y,z])
+#         print "#"
+#       else
+#         print "."
+#       end
+#     end
+#     puts
+#   end
+#   puts "----------"
+# end
 
 #
 # # puts "layer #{z}"
