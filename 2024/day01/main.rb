@@ -14,9 +14,7 @@ left, right = input
   .split("\n")
   .map { |line| line.split.map(&:to_i) }
   .transpose
-
-left = left.sort
-right = right.sort
+  .map(&:sort)
 
 # PART 1
 puts left.zip(right).map { |l, r| (l - r).abs }.sum
