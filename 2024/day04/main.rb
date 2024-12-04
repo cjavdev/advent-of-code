@@ -43,9 +43,7 @@ end
 def xmas2?(rows, x, y)
   # x,y is the coords of the A in MAS
   coords = []
-  # [[-1, -1], [-1, 1], [1, -1], [1, 1]].each do |dx, dy|
-    coords << [x, y] if xmas2_dir?(rows, x, y)#, dx, dy)
-  # end
+  coords << [x, y] if xmas2_dir?(rows, x, y)
   coords
 end
 
