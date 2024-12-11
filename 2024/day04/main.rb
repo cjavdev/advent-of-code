@@ -18,16 +18,13 @@ rows = input.split("\n").map(&:chars)
 
 # Find all the X's since those are always the start of the word, then grow in all directions to see if it's XMAS
 def xmas?(rows, x, y)
-  found = 0
-  found += 1 if xmas_dir?(rows, x, y, -1, -1)
-  found += 1 if xmas_dir?(rows, x, y, -1, 0)
-  found += 1 if xmas_dir?(rows, x, y, -1, 1)
-  found += 1 if xmas_dir?(rows, x, y, 0, -1)
-  found += 1 if xmas_dir?(rows, x, y, 0, 1)
-  found += 1 if xmas_dir?(rows, x, y, 1, -1)
-  found += 1 if xmas_dir?(rows, x, y, 1, 0)
-  found += 1 if xmas_dir?(rows, x, y, 1, 1)
-  found
+  directions = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1],         [0, 1],
+    [1, -1], [1, 0], [1, 1]
+  ]
+
+  directions.count { |dx, dy| xmas_dir?(rows, x, y, dx, dy) }
 end
 
 def xmas_dir?(rows, x, y, dx, dy)
