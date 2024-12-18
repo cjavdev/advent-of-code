@@ -21,6 +21,7 @@ end
     end
   end
 
+  puts "Debug: #{new_stones}" if ENV['DEBUG']
   new_stones
 end
 
