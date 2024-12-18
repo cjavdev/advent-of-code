@@ -21,7 +21,7 @@ end
     end
   end
 
-  new_stones
+  p new_stones
 end
 
 6.times do
