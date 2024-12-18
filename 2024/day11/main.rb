@@ -1,3 +1,4 @@
+require 'rspec/autorun'
 
 input = "125 17"
 inputx = "41078 18 7 0 4785508 535256 8154 447"
