@@ -21,7 +21,8 @@ end
     end
   end
 
-  p new_stones
+  puts "Debug: #{new_stones}" if ENV['DEBUG']
+  new_stones
 end
 
 6.times do
