@@ -1,3 +1,4 @@
+require 'rspec/autorun'
 
 input = "125 17"
 inputx = "41078 18 7 0 4785508 535256 8154 447"
@@ -6,7 +7,7 @@ stones = input.split(" ").map(&:to_i).each_with_object(Hash.new(0)) do |stone, h
   h[stone] = 1
 end
 
-def blink(stones)
+  def blink(stones)
   new_stones = Hash.new(0)
 
   stones.each do |stone, count|
@@ -20,6 +21,7 @@ def blink(stones)
     end
   end
 
+  puts "Debug: #{new_stones}" if ENV['DEBUG']
   new_stones
 end
 
