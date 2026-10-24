@@ -1,4 +1,4 @@
-require '../day3/diagnostic.rb'
+require_relative '../../2021/day3/diagnostic.rb'
 require 'byebug'
 
 def gamma_rate(input)

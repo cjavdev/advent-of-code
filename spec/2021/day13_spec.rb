@@ -1,4 +1,4 @@
-require_relative '../day13/paper.rb'
+require_relative '../../2021/day13/paper.rb'
 
 RSpec.describe Paper do
   let(:paper) do

@@ -1,4 +1,4 @@
-require_relative '../day14/polymer.rb'
+require_relative '../../2021/day14/polymer.rb'
 
 RSpec.describe Polymer do
   it 'PART2 does a step correctly' do

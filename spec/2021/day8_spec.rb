@@ -1,4 +1,4 @@
-require '../day8/segments.rb'
+require_relative '../../2021/day8/segments.rb'
 require 'byebug'
 
 RSpec.describe Segments do

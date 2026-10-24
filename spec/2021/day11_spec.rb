@@ -1,4 +1,4 @@
-require_relative '../day11/cavern.rb'
+require_relative '../../2021/day11/cavern.rb'
 require 'byebug'
 
 RSpec.describe Cavern do
