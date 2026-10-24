@@ -1,4 +1,4 @@
-require '../day1/number_of_increases.rb'
+require_relative '../../2021/day1/number_of_increases.rb'
 
 RSpec.describe "day1" do
   describe 'sum_of_windows' do

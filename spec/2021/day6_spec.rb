@@ -1,4 +1,4 @@
-require '../day6/school.rb'
+require_relative '../../2021/day6/school.rb'
 
 RSpec.describe School do
   it 'decreases the age when a day passes' do

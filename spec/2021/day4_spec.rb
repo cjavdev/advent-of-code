@@ -1,4 +1,4 @@
-require '../day4/bingo.rb'
+require_relative '../../2021/day4/bingo.rb'
 require 'byebug'
 
 

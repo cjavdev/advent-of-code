@@ -1,4 +1,4 @@
-require_relative '../day12/caves.rb'
+require_relative '../../2021/day12/caves.rb'
 
 RSpec.describe Caves do
   it 'stores the possible paths' do

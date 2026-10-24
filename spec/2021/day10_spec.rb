@@ -1,4 +1,4 @@
-require_relative '../day10/syntax.rb'
+require_relative '../../2021/day10/syntax.rb'
 require 'byebug'
 
 RSpec.describe Subsystem do

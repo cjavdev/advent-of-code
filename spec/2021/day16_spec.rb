@@ -1,4 +1,4 @@
-require_relative '../day16/decoder.rb'
+require_relative '../../2021/day16/decoder.rb'
 
 RSpec.describe LiteralPacket do
   let(:packet) do

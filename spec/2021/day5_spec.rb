@@ -1,4 +1,4 @@
-require '../day5/vents.rb'
+require_relative '../../2021/day5/vents.rb'
 
 RSpec.describe OceanFloor do
   it 'parses lines as expected' do

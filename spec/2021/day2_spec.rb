@@ -1,5 +1,5 @@
-require '../day2/submarine.rb'
-require '../day2/aiming_submarine.rb'
+require_relative '../../2021/day2/submarine.rb'
+require_relative '../../2021/day2/aiming_submarine.rb'
 
 
 RSpec.describe AimingSubmarine do

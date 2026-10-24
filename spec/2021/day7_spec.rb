@@ -1,4 +1,4 @@
-require '../day7/crabs.rb'
+require_relative '../../2021/day7/crabs.rb'
 
 RSpec.describe Crabs do
   # it 'calculates fuel required for one hop' do

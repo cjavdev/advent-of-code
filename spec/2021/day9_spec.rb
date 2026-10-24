@@ -1,4 +1,4 @@
-require_relative '../day9/height_map.rb'
+require_relative '../../2021/day9/height_map.rb'
 require 'byebug'
 
 RSpec.describe HeightMap do

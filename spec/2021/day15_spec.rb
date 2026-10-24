@@ -1,4 +1,4 @@
-require_relative '../day15/graph.rb'
+require_relative '../../2021/day15/graph.rb'
 
 RSpec.describe Graph do
   it 'calculates the total risk level' do
